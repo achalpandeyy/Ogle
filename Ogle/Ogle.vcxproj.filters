@@ -27,6 +27,9 @@
     <ClCompile Include="External\glad\src\glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\glad\include\glad\glad.h">
@@ -890,6 +893,12 @@
     <ClInclude Include="External\stb_image\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Win32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="External\glm\detail\func_common.inl">
@@ -1300,5 +1309,7 @@
     <None Include="External\glm\gtx\wrap.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="Source\Shaders\Shader.frag" />
+    <None Include="Source\Shaders\Shader.vert" />
   </ItemGroup>
 </Project>

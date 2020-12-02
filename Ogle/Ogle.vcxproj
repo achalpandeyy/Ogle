@@ -92,6 +92,7 @@
     <ClCompile Include="External\glm\detail\glm.cpp" />
     <ClCompile Include="External\stb_image\stb_image.cpp" />
     <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\glad\include\glad\glad.h" />
@@ -381,6 +382,8 @@
     <ClInclude Include="External\glm\vec4.hpp" />
     <ClInclude Include="External\glm\vector_relational.hpp" />
     <ClInclude Include="External\stb_image\stb_image.h" />
+    <ClInclude Include="Source\Shader.h" />
+    <ClInclude Include="Source\Win32.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="External\glm\detail\func_common.inl" />
@@ -519,6 +522,8 @@
     <None Include="External\glm\gtx\vector_angle.inl" />
     <None Include="External\glm\gtx\vector_query.inl" />
     <None Include="External\glm\gtx\wrap.inl" />
+    <None Include="Source\Shaders\Shader.frag" />
+    <None Include="Source\Shaders\Shader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

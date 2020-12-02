@@ -1,9 +1,11 @@
 #include "Win32.h"
+#include "Shader.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -144,8 +146,8 @@ int main()
 
     glBindVertexArray(0);
 
-    const char* vertex_shader_path = "Ogle/Source/Shaders/Shader.vert";
-    const char* fragment_shader_path = "Ogle/Source/Shaders/Shader.frag";
+    Shader shader("Source/Shaders/Shader.vert", "Source/Shaders/Shader.frag");
+    shader.Bind();
 
     while (!glfwWindowShouldClose(window))
     {
@@ -153,7 +155,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         glBindVertexArray(vao);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
 
