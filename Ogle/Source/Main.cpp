@@ -4,6 +4,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <stb_image/stb_image.h>
 #include <iostream>
 #include <fstream>
@@ -91,10 +93,10 @@ int main()
 
     float vertices[] =
     {
-        -0.5f, -0.5f, 0.f, 0.f,
-         0.5f, -0.5f, 1.f, 0.f,
-         0.5f,  0.5f, 1.f, 1.f,
-        -0.5f,  0.5f, 0.f, 1.f
+        480.f, 200.f, 0.f, 0.f,
+        800.f, 200.f, 1.f, 0.f,
+        800.f, 520.f, 1.f, 1.f,
+        480.f, 520.f, 0.f, 1.f
     };
 
     unsigned int indices[] = { 0, 1, 2, 2, 3, 0 };
@@ -182,6 +184,9 @@ int main()
 
     Shader shader("Source/Shaders/Shader.vert", "Source/Shaders/Shader.frag");
     shader.Bind();
+
+    glm::mat4 proj = glm::ortho(0.f, (float)width, 0.f, (float)height);
+    shader.SetMat4("pvm", glm::value_ptr(proj), false);
 
     while (!glfwWindowShouldClose(window))
     {

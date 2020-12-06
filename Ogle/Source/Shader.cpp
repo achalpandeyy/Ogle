@@ -20,6 +20,12 @@ Shader::Shader(const char* vertex_path, const char* fragment_path)
     glDeleteShader(fragment_shader);
 }
 
+void Shader::SetMat4(const char* uniform_name, const GLfloat* value, GLboolean transpose) const
+{
+    GLint location = glGetUniformLocation(id, uniform_name);
+    glUniformMatrix4fv(location, 1, transpose, value);
+}
+
 GLuint Shader::CreateShader(const char* path, ShaderType type) const
 {
     std::ifstream file(path);
