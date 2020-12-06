@@ -93,10 +93,10 @@ int main()
 
     float vertices[] =
     {
-        480.f, 200.f, 0.f, 0.f,
-        800.f, 200.f, 1.f, 0.f,
-        800.f, 520.f, 1.f, 1.f,
-        480.f, 520.f, 0.f, 1.f
+        -0.5f, -0.5f, -0.f,  0.f, 0.f,
+         0.5f, -0.5f, -0.f,  1.f, 0.f,
+         0.5f,  0.5f, -0.f,  1.f, 1.f,
+        -0.5f,  0.5f, -0.f,  0.f, 1.f
     };
 
     unsigned int indices[] = { 0, 1, 2, 2, 3, 0 };
@@ -113,7 +113,7 @@ int main()
         glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
         if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
         {
-            std::cout << "Note: Debug context initialized" << std::endl;
+            std::cout << "Note: Debug context initialized\n" << std::endl;
 
             glEnable(GL_DEBUG_OUTPUT);
             glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -131,6 +131,8 @@ int main()
         std::cout << "GPU Vendor: " << opengl_vendor << std::endl;
         std::cout << "Renderer: " << opengl_renderer << std::endl;
         std::cout << "OpenGL Version: " << opengl_version << std::endl;
+
+        std::cout << std::endl;
     }
 
     glViewport(0, 0, width, height);
@@ -149,11 +151,11 @@ int main()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    GLsizei stride = 4 * sizeof(float);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, stride, (const void*)0);
+    GLsizei stride = 5 * sizeof(float);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (const void*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (const void*)(2 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (const void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
@@ -182,11 +184,17 @@ int main()
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
+    stbi_image_free(tex_data);
+
     Shader shader("Source/Shaders/Shader.vert", "Source/Shaders/Shader.frag");
     shader.Bind();
 
-    glm::mat4 proj = glm::ortho(0.f, (float)width, 0.f, (float)height);
-    shader.SetMat4("pvm", glm::value_ptr(proj), false);
+    glm::mat4 model = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, -2.f));
+    model = glm::rotate(model, glm::radians(55.f), glm::vec3(-1.f, 0.f, 0.f));
+    glm::mat4 proj = glm::perspective(glm::radians(45.f), (float)width / (float)height, 0.1f, 100.f);
+
+    glm::mat4 pvm = proj * model;
+    shader.SetMat4("pvm", glm::value_ptr(pvm), false);
 
     while (!glfwWindowShouldClose(window))
     {
