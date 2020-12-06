@@ -1,6 +1,7 @@
 # Directories
 .vs/
 Build/
+Resources/
 
 # Files
 *.user

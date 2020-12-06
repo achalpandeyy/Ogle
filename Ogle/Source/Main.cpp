@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <stb_image/stb_image.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -82,16 +83,18 @@ int main()
         return -1;
     }
 
+    glfwSetWindowTitle(window, "Ogle");
+
     glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
 
     glfwMakeContextCurrent(window);
 
     float vertices[] =
     {
-        -0.5f, -0.5f,
-         0.5f, -0.5f,
-         0.5f,  0.5f,
-        -0.5f,  0.5f
+        -0.5f, -0.5f, 0.f, 0.f,
+         0.5f, -0.5f, 1.f, 0.f,
+         0.5f,  0.5f, 1.f, 1.f,
+        -0.5f,  0.5f, 0.f, 1.f
     };
 
     unsigned int indices[] = { 0, 1, 2, 2, 3, 0 };
@@ -119,10 +122,13 @@ int main()
 #endif
 
     {
+        const GLubyte* opengl_vendor = glGetString(GL_VENDOR);
+        const GLubyte* opengl_renderer = glGetString(GL_RENDERER);
         const GLubyte* opengl_version = glGetString(GL_VERSION);
-        std::ostringstream oss;
-        oss << "Ogle - " << opengl_version << std::endl;
-        glfwSetWindowTitle(window, oss.str().c_str());
+
+        std::cout << "GPU Vendor: " << opengl_vendor << std::endl;
+        std::cout << "Renderer: " << opengl_renderer << std::endl;
+        std::cout << "OpenGL Version: " << opengl_version << std::endl;
     }
 
     glViewport(0, 0, width, height);
@@ -141,26 +147,60 @@ int main()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const void*)0);
+    GLsizei stride = 4 * sizeof(float);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, stride, (const void*)0);
     glEnableVertexAttribArray(0);
 
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (const void*)(2 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
     glBindVertexArray(0);
+
+    const char* tex_path = "../Resources/container.jpg";
+    int tex_width, tex_height, tex_channel_count;
+    unsigned char* tex_data = stbi_load(tex_path, &tex_width, &tex_height, &tex_channel_count, 0);
+    assert(tex_channel_count == 3);
+    if (!tex_data)
+    {
+        std::cout << "Failed to load texture at " << tex_path << std::endl;
+        exit(1);
+    }
+
+    GLuint texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tex_width, tex_height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     Shader shader("Source/Shaders/Shader.vert", "Source/Shaders/Shader.frag");
     shader.Bind();
 
     while (!glfwWindowShouldClose(window))
     {
-        glClearColor(0.8f, 0.3f, 0.2f, 1.f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glBindVertexArray(vao);
+        glBindTexture(GL_TEXTURE_2D, texture);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
 
         glfwPollEvents();
     }
+
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
+    glDeleteBuffers(1, &ibo);
+    glDeleteTextures(1, &texture);
 
     glfwTerminate();
     return 0;
