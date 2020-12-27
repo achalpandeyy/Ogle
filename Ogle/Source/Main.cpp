@@ -11,7 +11,7 @@
 #include <fstream>
 #include <sstream>
 
-glm::vec3 camera_position(0.f, 0.f, 3.f);
+glm::vec3 camera_position(3.f, 2.f, 7.f);
 glm::vec3 camera_front = glm::vec3(0.f, 0.f, -1.f);
 glm::vec3 camera_orientation(0.f, 1.f, 0.f);
 
@@ -25,7 +25,7 @@ double last_x = (double)width / 2;
 double last_y = (double)height / 2;
 float yaw = -90.f;
 float pitch = 0.f;
-float camera_fov = 45.f;
+float camera_fov = 60.f;
 bool first_mouse = true;
 
 void GLFWFramebufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -66,9 +66,10 @@ void GLFWMouseCallback(GLFWwindow* window, double x_pos, double y_pos)
 
 void GLFWScrollCallback(GLFWwindow* window, double x_offset, double y_offset)
 {
-    camera_fov -= y_offset;
+    camera_fov -= (float)y_offset;
     camera_fov = glm::clamp(camera_fov, 1.f, 45.f);
 }
+
 
 #ifdef _DEBUG
 void WINAPI GLDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length,
@@ -125,7 +126,6 @@ int main()
     if (!glfwInit())
         return -1;
 
-
 #ifdef _DEBUG
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 #endif
@@ -147,62 +147,11 @@ int main()
 
     glfwMakeContextCurrent(window);
 
-    // Todo: You can use the GL_TRIANGLE_STRIP primitive, that way, you won't need
-    // to store this many vertices for a cube
-    float vertices[] =
-    {
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-    };
-
-    unsigned int indices[] = { 0, 1, 2, 2, 3, 0 };
-
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
-
-    glEnable(GL_DEPTH_TEST);
 
 #ifdef _DEBUG
     {
@@ -230,64 +179,100 @@ int main()
         std::cout << "OpenGL Version: " << opengl_version << std::endl;
 
         std::cout << std::endl;
+
+        GLint max_work_group_count;
+        GLint max_work_group_size;
+        for (unsigned int i = 0; i < 3; ++i)
+        {
+            glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, i, &max_work_group_count);
+            glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, i, &max_work_group_size);
+            std::cout << (char)(i + 88) << ":" << std::endl;
+            std::cout << "\tMax Work Group Count: " << max_work_group_count << std::endl;
+            std::cout << "\tMax Work Group Size: " << max_work_group_size << std::endl;
+
+            std::cout << std::endl;
+        }
+
+        GLint max_work_group_invocations;
+        glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &max_work_group_invocations);
+
+        std::cout << "Max Work Group Invocations: " << max_work_group_invocations << std::endl;
     }
 
     glViewport(0, 0, width, height);
 
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
-    GLuint vbo;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    GLsizei stride = 5 * sizeof(float);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (const void*)0);
-    glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (const void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    glBindVertexArray(0);
-
-    const char* tex_path = "../Resources/container.jpg";
-    int tex_width, tex_height, tex_channel_count;
-    unsigned char* tex_data = stbi_load(tex_path, &tex_width, &tex_height, &tex_channel_count, 0);
-    assert(tex_channel_count == 3);
-    if (!tex_data)
-    {
-        std::cout << "Failed to load texture at " << tex_path << std::endl;
-        exit(1);
-    }
-
-    GLuint texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    GLuint fb_texture;
+    glGenTextures(1, &fb_texture);
+    glBindTexture(GL_TEXTURE_2D, fb_texture);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tex_width, tex_height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_data);
-    glGenerateMipmap(GL_TEXTURE_2D);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, 0);
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    stbi_image_free(tex_data);
+    float quad_vertices[] =
+    {
+        -1.f, -1.f,
+         1.f, -1.f,
+         1.f,  1.f,
+        -1.f,  1.f
+    };
 
-    Shader shader("Source/Shaders/Shader.vert", "Source/Shaders/Shader.frag");
-    shader.Bind();
+    unsigned int quad_indices[] = { 0, 1, 2, 2, 3, 0 };
 
-    glm::mat4 model = glm::mat4(1.f);
+    GLuint quad_vao;
+    glGenVertexArrays(1, &quad_vao);
+    glBindVertexArray(quad_vao);
+
+    GLuint quad_vbo;
+    glGenBuffers(1, &quad_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertices), quad_vertices, GL_STATIC_DRAW);
+
+    GLuint quad_ibo;
+    glGenBuffers(1, &quad_ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quad_ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quad_indices), quad_indices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+
+    Shader raytracing_shader("Source/Shaders/Raytracing.comp");
+    Shader quad_shader("Source/Shaders/QuadShader.vert", "Source/Shaders/QuadShader.frag");
+
+    GLint work_group_size[3] = {};
+    glGetProgramiv(raytracing_shader.id, GL_COMPUTE_WORK_GROUP_SIZE, work_group_size);
 
     glm::mat4 view = glm::translate(glm::mat4(1.f), -camera_position);
     glm::mat4 proj = glm::perspective(glm::radians(camera_fov), (float)width / (float)height, 0.1f, 100.f);
 
-    glm::mat4 pvm = proj * view * model;
-    shader.SetMat4("pvm", glm::value_ptr(pvm), false);
+    glm::mat4 view_proj_inv = glm::inverse(view)* glm::inverse(proj);
+
+    raytracing_shader.Bind();
+
+    raytracing_shader.SetVec3("u_Eye", camera_position.x, camera_position.y, camera_position.z);
+
+    glm::vec4 ray00 = view_proj_inv * glm::vec4(-1.f, -1.f, 0.f, 1.f);
+    ray00 /= ray00.w;
+    raytracing_shader.SetVec3("u_Ray00", ray00.x - camera_position.x, ray00.y - camera_position.y, ray00.z - camera_position.z);
+
+    glm::vec4 ray01 = view_proj_inv * glm::vec4(-1.f, 1.f, 0.f, 1.f);
+    ray01 /= ray01.w;
+    raytracing_shader.SetVec3("u_Ray01", ray01.x - camera_position.x, ray01.y - camera_position.y, ray01.z - camera_position.z);
+
+    glm::vec4 ray10 = view_proj_inv * glm::vec4(1.f, -1.f, 0.f, 1.f);
+    ray10 /= ray10.w;
+    raytracing_shader.SetVec3("u_Ray10", ray10.x - camera_position.x, ray10.y - camera_position.y, ray10.z - camera_position.z);
+
+    glm::vec4 ray11 = view_proj_inv * glm::vec4(1.f, 1.f, 0.f, 1.f);
+    ray11 /= ray11.w;
+    raytracing_shader.SetVec3("u_Ray11", ray11.x - camera_position.x, ray11.y - camera_position.y, ray11.z - camera_position.z);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -320,30 +305,59 @@ int main()
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         {
             camera_position += camera_speed * camera_right;
-        }       
+        }
 
         glfwPollEvents();
 
         view = glm::lookAt(camera_position, camera_position + camera_front, camera_orientation);
         proj = glm::perspective(glm::radians(camera_fov), (float)width / (float)height, 0.1f, 100.f);
-        pvm = proj * view * model;
 
-        shader.Bind();
-        shader.SetMat4("pvm", glm::value_ptr(pvm), false);
+        glm::mat4 view_proj_inv = glm::inverse(view) * glm::inverse(proj);
 
-        glClearColor(0.1f, 0.1f, 0.1f, 1.f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        raytracing_shader.Bind();
 
-        glBindVertexArray(vao);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        raytracing_shader.SetVec3("u_Eye", camera_position.x, camera_position.y, camera_position.z);
+
+        ray00 = view_proj_inv * glm::vec4(-1.f, -1.f, 0.f, 1.f);
+        ray00 /= ray00.w;
+        raytracing_shader.SetVec3("u_Ray00", ray00.x - camera_position.x, ray00.y - camera_position.y, ray00.z - camera_position.z);
+
+        ray01 = view_proj_inv * glm::vec4(-1.f, 1.f, 0.f, 1.f);
+        ray01 /= ray01.w;
+        raytracing_shader.SetVec3("u_Ray01", ray01.x - camera_position.x, ray01.y - camera_position.y, ray01.z - camera_position.z);
+
+        ray10 = view_proj_inv * glm::vec4(1.f, -1.f, 0.f, 1.f);
+        ray10 /= ray10.w;
+        raytracing_shader.SetVec3("u_Ray10", ray10.x - camera_position.x, ray10.y - camera_position.y, ray10.z - camera_position.z);
+
+        ray11 = view_proj_inv * glm::vec4(1.f, 1.f, 0.f, 1.f);
+        ray11 /= ray11.w;
+        raytracing_shader.SetVec3("u_Ray11", ray11.x - camera_position.x, ray11.y - camera_position.y, ray11.z - camera_position.z);
+
+        // Bind level 0 of the framebuffer texture to image binding point 0
+        glBindImageTexture(0, fb_texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+
+        // Todo: Shoule width and height be a power of two?
+        // Dispatch the compute shader to generate a frame in the framebuffer image
+        glDispatchCompute(width / work_group_size[0], height / work_group_size[1], 1);
+
+        // Unbind image binding point
+        glBindImageTexture(0, 0, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, fb_texture);
+
+        quad_shader.Bind();
+        glBindVertexArray(quad_vao);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
     }
 
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
-    glDeleteTextures(1, &texture);
+    glDeleteVertexArrays(1, &quad_vao);
+    glDeleteBuffers(1, &quad_vbo);
+    glDeleteBuffers(1, &quad_ibo);
+    glDeleteTextures(1, &fb_texture);
 
     glfwTerminate();
     return 0;

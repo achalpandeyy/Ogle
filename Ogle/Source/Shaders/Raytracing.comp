@@ -1,0 +1,89 @@
+#version 460 core
+
+// Note: This uniform is one level of a texture
+layout (binding = 0, rgba32f) uniform image2D u_Framebuffer;
+
+uniform vec3 u_Eye;
+uniform vec3 u_Ray00;
+uniform vec3 u_Ray10;
+uniform vec3 u_Ray01;
+uniform vec3 u_Ray11;
+
+#define MAX_SCENE_BOUNDS 1000.0
+#define BOX_COUNT 2
+
+layout (local_size_x = 8, local_size_y = 8) in;
+
+struct Box
+{
+	vec3 min_point;
+	vec3 max_point;
+};
+
+struct HitInfo
+{
+	unsigned int id;
+	vec2 lambda;
+};
+
+const Box boxes[] =
+{
+	{ vec3(-5.f, -0.1f, -5.f), vec3(5.f, 0.f, 5.f) },
+	{ vec3(-0.5f, 0.f, -0.5f), vec3(0.5f, 1.f, 0.5f) }
+};
+
+vec2 IntersectBox(vec3 ray_origin, vec3 ray_direction, const Box box)
+{
+	vec3 t_min = (box.min_point - ray_origin) / ray_direction;
+	vec3 t_max = (box.max_point - ray_origin) / ray_direction;
+	vec3 t1 = min(t_min, t_max);
+	vec3 t2 = max(t_min, t_max);
+	float t_near = max(max(t1.x, t1.y), t1.z);
+	float t_far = min(min(t2.x, t2.y), t2.z);
+	return vec2(t_near, t_far);
+}
+
+bool IntersectBoxes(vec3 ray_origin, vec3 ray_direction, out HitInfo hit_info)
+{
+	float smallest = MAX_SCENE_BOUNDS;
+	bool found = false;
+
+	for (unsigned int i = 0; i < BOX_COUNT; ++i)
+	{
+		vec2 lambda = IntersectBox(ray_origin, ray_direction, boxes[i]);
+		if (lambda.x > 0.f && lambda.x < lambda.y && lambda.x < smallest)
+		{
+			hit_info.lambda = lambda;
+			hit_info.id = i;
+			smallest = lambda.x;
+			found = true;
+		}
+	}
+
+	return found;
+}
+
+vec4 Trace(vec3 ray_origin, vec3 ray_direction)
+{
+	HitInfo hit_info;
+	if (IntersectBoxes(ray_origin, ray_direction, hit_info))
+	{
+		vec4 shade_of_gray = vec4((hit_info.id / 10.f) + 0.8f);
+		return vec4(shade_of_gray.rgb, 1.f);
+	}
+	return vec4(0.f, 0.f, 0.f, 1.f);
+}
+
+void main()
+{
+	uvec2 pixel = gl_GlobalInvocationID.xy;
+	uvec2 dimensions = imageSize(u_Framebuffer);
+
+	if (pixel.x >= dimensions.x || pixel.y >= dimensions.y)
+		return;
+	
+	vec2 normalized_pos = vec2(pixel) / vec2(dimensions);
+	vec3 direction = mix(mix(u_Ray00, u_Ray01, normalized_pos.y), mix(u_Ray10, u_Ray11, normalized_pos.y), normalized_pos.x);
+	vec4 color = Trace(u_Eye, direction);
+	imageStore(u_Framebuffer, ivec2(pixel), color);
+}

@@ -1309,7 +1309,8 @@
     <None Include="External\glm\gtx\wrap.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="Source\Shaders\Shader.frag" />
-    <None Include="Source\Shaders\Shader.vert" />
+    <None Include="Source\Shaders\QuadShader.frag" />
+    <None Include="Source\Shaders\QuadShader.vert" />
+    <None Include="Source\Shaders\Raytracing.comp" />
   </ItemGroup>
 </Project>

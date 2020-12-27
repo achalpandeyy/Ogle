@@ -20,10 +20,29 @@ Shader::Shader(const char* vertex_path, const char* fragment_path)
     glDeleteShader(fragment_shader);
 }
 
-void Shader::SetMat4(const char* uniform_name, const GLfloat* value, GLboolean transpose) const
+Shader::Shader(const char* compute_path)
 {
-    GLint location = glGetUniformLocation(id, uniform_name);
+    GLuint compute_shader = CreateShader(compute_path, ShaderType::Compute);
+
+    id = glCreateProgram();
+    glAttachShader(id, compute_shader);
+    glLinkProgram(id);
+
+    if (CheckShaderErrors(id, ShaderType::Program)) exit(1);
+
+    glDeleteShader(compute_shader);
+}
+
+void Shader::SetMat4(const char* name, const GLfloat* value, GLboolean transpose) const
+{
+    GLint location = glGetUniformLocation(id, name);
     glUniformMatrix4fv(location, 1, transpose, value);
+}
+
+void Shader::SetVec3(const char* name, const GLfloat x, const GLfloat y, const GLfloat z) const
+{
+    GLint location = glGetUniformLocation(id, name);
+    glUniform3f(location, x, y, z);
 }
 
 GLuint Shader::CreateShader(const char* path, ShaderType type) const
@@ -38,7 +57,18 @@ GLuint Shader::CreateShader(const char* path, ShaderType type) const
         const std::string& shader_source = shader_stream.str();
         const char* shader_source_c_str = shader_source.c_str();
 
-        GLuint shader = glCreateShader(type == ShaderType::Vertex ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
+        GLenum shader_type = GL_VERTEX_SHADER;
+        switch (type)
+        {
+        case ShaderType::Fragment:
+            shader_type = GL_FRAGMENT_SHADER;
+            break;
+        case ShaderType::Compute:
+            shader_type = GL_COMPUTE_SHADER;
+            break;
+        }
+
+        GLuint shader = glCreateShader(shader_type);
         glShaderSource(shader, 1, &shader_source_c_str, 0);
         glCompileShader(shader);
 
@@ -73,7 +103,18 @@ bool Shader::CheckShaderErrors(GLuint shader, ShaderType type) const
             GLchar info_log[512];
             glGetShaderInfoLog(shader, 512, nullptr, info_log);
 
-            std::cout << "Failed to compile " << (type == ShaderType::Vertex ? "vertex" : "fragment") << " shader.\n"
+            std::string shader_type = "vertex";
+            switch (type)
+            {
+            case ShaderType::Fragment:
+                shader_type = "fragment";
+                break;
+            case ShaderType::Compute:
+                shader_type = "compute";
+                break;
+            }
+
+            std::cout << "Failed to compile " << shader_type << " shader.\n"
                 << info_log << std::endl;
 
             return true;

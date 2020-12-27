@@ -6,24 +6,27 @@
 struct Shader
 {
     Shader(const char* vertex_path, const char* fragment_path);
+    Shader(const char* compute_path);
 
     void Bind() const { glUseProgram(id); }
     void Unbind() const { glUseProgram(0); }
 
-    void SetMat4(const char* uniform_name, const GLfloat* value, GLboolean transpose) const;
+    void SetMat4(const char* name, const GLfloat* value, GLboolean transpose) const;
+    void SetVec3(const char* name, const GLfloat x, const GLfloat y, const GLfloat z) const;
+
+    GLuint id;
 
 private:
     enum class ShaderType
     {
         Vertex,
         Fragment,
+        Compute,
         Program
     };
 
     GLuint CreateShader(const char* path, ShaderType type) const;
     bool CheckShaderErrors(GLuint shader, ShaderType type) const;
-
-    GLuint id;
 };
 
 #define SHADER_H
