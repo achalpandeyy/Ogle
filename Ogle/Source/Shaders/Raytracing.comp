@@ -4,10 +4,10 @@
 layout (binding = 0, rgba32f) uniform image2D u_Framebuffer;
 
 uniform vec3 u_Eye;
-uniform vec3 u_Ray00;
-uniform vec3 u_Ray10;
-uniform vec3 u_Ray01;
-uniform vec3 u_Ray11;
+uniform vec3 u_RayDirection00;
+uniform vec3 u_RayDirection01;
+uniform vec3 u_RayDirection10;
+uniform vec3 u_RayDirection11;
 
 #define MAX_SCENE_BOUNDS 1000.0
 #define BOX_COUNT 2
@@ -83,7 +83,7 @@ void main()
 		return;
 	
 	vec2 normalized_pos = vec2(pixel) / vec2(dimensions);
-	vec3 direction = mix(mix(u_Ray00, u_Ray01, normalized_pos.y), mix(u_Ray10, u_Ray11, normalized_pos.y), normalized_pos.x);
+	vec3 direction = mix(mix(u_RayDirection00, u_RayDirection01, normalized_pos.y), mix(u_RayDirection10, u_RayDirection11, normalized_pos.y), normalized_pos.x);
 	vec4 color = Trace(u_Eye, direction);
 	imageStore(u_Framebuffer, ivec2(pixel), color);
 }

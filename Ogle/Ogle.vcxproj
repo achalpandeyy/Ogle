@@ -522,8 +522,8 @@
     <None Include="External\glm\gtx\vector_angle.inl" />
     <None Include="External\glm\gtx\vector_query.inl" />
     <None Include="External\glm\gtx\wrap.inl" />
-    <None Include="Source\Shaders\QuadShader.frag" />
-    <None Include="Source\Shaders\QuadShader.vert" />
+    <None Include="Source\Shaders\FullscreenQuadShader.frag" />
+    <None Include="Source\Shaders\FullscreenQuadShader.vert" />
     <None Include="Source\Shaders\Raytracing.comp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
