@@ -92,7 +92,9 @@
     <ClCompile Include="External\glm\detail\glm.cpp" />
     <ClCompile Include="External\stb_image\stb_image.cpp" />
     <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\Mesh.cpp" />
     <ClCompile Include="Source\Shader.cpp" />
+    <ClCompile Include="Source\Texture2D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\glad\include\glad\glad.h" />
@@ -382,7 +384,9 @@
     <ClInclude Include="External\glm\vec4.hpp" />
     <ClInclude Include="External\glm\vector_relational.hpp" />
     <ClInclude Include="External\stb_image\stb_image.h" />
+    <ClInclude Include="Source\Mesh.h" />
     <ClInclude Include="Source\Shader.h" />
+    <ClInclude Include="Source\Texture2D.h" />
     <ClInclude Include="Source\Win32.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,7 @@
 #include "Win32.h"
 #include "Shader.h"
+#include "Mesh.h"
+#include "Texture2D.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -152,43 +154,6 @@ void WINAPI GLDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum se
 }
 #endif
 
-struct Mesh
-{
-    Mesh(const float* vertices, unsigned int vertex_count, const unsigned int* indices, unsigned int index_count)
-    {
-        glGenVertexArrays(1, &vao);
-        BindVAO();
-
-        glGenBuffers(1, &vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, vertex_count * sizeof(float), vertices, GL_STATIC_DRAW);
-
-        glGenBuffers(1, &ibo);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned int), indices, GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-
-        UnbindVAO();
-    }
-
-    ~Mesh()
-    {
-        glDeleteVertexArrays(1, &vao);
-        glDeleteBuffers(1, &vbo);
-        glDeleteBuffers(1, &ibo);
-    }
-
-    inline void BindVAO() const { glBindVertexArray(vao); }
-    inline void UnbindVAO() const { glBindVertexArray(0); }
-
-private:
-    GLuint vao;
-    GLuint vbo;
-    GLuint ibo;
-};
-
 glm::vec3 GetRayDirectionFromNDC(const glm::vec2& ndc, const glm::mat4& view_proj_inverse, const glm::vec3& ray_origin)
 {
     glm::vec4 point_world_space = view_proj_inverse * glm::vec4(ndc, 0.f, 1.f);
@@ -290,19 +255,12 @@ int main()
 
     Mesh fullscreen_quad(quad_vertices, 8 * 2, quad_indices, 6);
 
-    GLuint fb_texture;
-    glGenTextures(1, &fb_texture);
-    glBindTexture(GL_TEXTURE_2D, fb_texture);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, g_width, g_height, 0, GL_RGBA, GL_FLOAT, 0);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
+    // Todo: I think this should be an immutable storage according to OpenGL
+    Texture2D fb_texture(g_width, g_height, GL_RGBA32F, GL_RGBA, GL_FLOAT);
 
     Shader fullscreen_quad_shader("Source/Shaders/FullscreenQuadShader.vert", "Source/Shaders/FullscreenQuadShader.frag");
 
+    // Ray Tracing Test
     Shader raytracing_shader("Source/Shaders/Raytracing.comp");
 
     glm::mat4 view = glm::translate(glm::mat4(1.f), -g_camera_position);
@@ -332,11 +290,23 @@ int main()
     glClearColor(0.1f, 0.1f, 0.1f, 1.f);
 
     // Image Processing Test
-    GLuint image_tex = GLuint(-1);
+    const char* image_path = "../Resources/container.jpg";
+    int image_tex_width, image_tex_height, image_tex_channel_count;
+    unsigned char* image_data = stbi_load(image_path, &image_tex_width, &image_tex_height, &image_tex_channel_count, 3);
+
+    if (!image_data)
+    {
+        std::cout << "Failed to load image: " << image_path << std::endl;
+        exit(1);
+    }
+
+    Texture2D image_tex(image_tex_width, image_tex_height, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, GL_LINEAR, GL_LINEAR, image_data);
+
+    stbi_image_free(image_data);
 
     while (!glfwWindowShouldClose(window))
     {
-        // Todo: For the image processing test I don't need delta_time
+        // Todo: For the image processing test I don't need g_delta_time
         float current_frame = (float)glfwGetTime();
         g_delta_time = current_frame - g_last_frame;
         g_last_frame = current_frame;
@@ -374,37 +344,9 @@ int main()
             glClearColor(0.8f, 0.3f, 0.2f, 1.f);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            if (image_tex == GLuint(-1))
-            {
-                const char* image_path = "../Resources/container.jpg";
-                int image_tex_width, image_tex_height, image_tex_channel_count;
-                unsigned char* image_data = stbi_load(image_path, &image_tex_width, &image_tex_height, &image_tex_channel_count, 3);
+            Shader blur_shader("Source/Shaders/GaussianBlur.comp");
 
-                if (image_data)
-                {
-                    glGenTextures(1, &image_tex);
-                    glBindTexture(GL_TEXTURE_2D, image_tex);
-
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-                    // Todo: You can make this an immutable texture
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image_tex_width, image_tex_height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
-
-                    glBindTexture(GL_TEXTURE_2D, 0);
-                }
-                else
-                {
-                    std::cout << "Failed to load image: " << image_path << std::endl;
-                    exit(1);
-                }
-
-                stbi_image_free(image_data);
-            }
-
-            glBindTexture(GL_TEXTURE_2D, image_tex);
+            image_tex.Bind();
 
             fullscreen_quad.BindVAO();
             fullscreen_quad_shader.Bind();
@@ -434,7 +376,7 @@ int main()
             raytracing_shader.SetVec3("u_RayDirection11", ray_direction11.x, ray_direction11.y, ray_direction11.z);
 
             // Bind level 0 of the framebuffer texture to image binding point 0
-            glBindImageTexture(0, fb_texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+            glBindImageTexture(0, fb_texture.id, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 
             // Dispatch the compute shader to generate a frame in the framebuffer image
             glDispatchCompute(g_width / work_group_size[0], g_height / work_group_size[1], 1);
@@ -443,7 +385,7 @@ int main()
             glBindImageTexture(0, 0, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, fb_texture);
+            fb_texture.Bind();
 
             fullscreen_quad_shader.Bind();
             fullscreen_quad.BindVAO();
@@ -453,9 +395,7 @@ int main()
         glfwSwapBuffers(window);
     }
 
-    glDeleteTextures(1, &fb_texture);
-    glDeleteTextures(1, &image_tex);
-
     glfwTerminate();
+
     return 0;
 }
