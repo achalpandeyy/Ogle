@@ -8,6 +8,8 @@ struct Shader
     Shader(const char* vertex_path, const char* fragment_path);
     Shader(const char* compute_path);
 
+    ~Shader();
+
     void Bind() const { glUseProgram(id); }
     void Unbind() const { glUseProgram(0); }
 

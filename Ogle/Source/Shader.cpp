@@ -33,6 +33,11 @@ Shader::Shader(const char* compute_path)
     glDeleteShader(compute_shader);
 }
 
+Shader::~Shader()
+{
+    glDeleteProgram(id);
+}
+
 void Shader::SetMat4(const char* name, const GLfloat* value, GLboolean transpose) const
 {
     GLint location = glGetUniformLocation(id, name);
@@ -123,4 +128,3 @@ bool Shader::CheckShaderErrors(GLuint shader, ShaderType type) const
 
     return false;
 }
-

@@ -3,7 +3,18 @@
 layout (binding = 0, rgba8) uniform image2D u_Framebuffer;
 layout (local_size_x = 8, local_size_y = 8) in;
 
+uniform sampler2D u_ImageSampler;
+
 void main()
 {
+	uvec2 pixel = gl_GlobalInvocationID.xy;
 
+	// Todo: How do I get dimensions of the framebuffer here?
+	// Todo: Maintain aspect ratio of the input image
+	vec2 tex_coords = pixel / vec2(1280.f, 720.f);
+
+	vec4 color = texture(u_ImageSampler, tex_coords);
+	float intensity = 0.299f * color.r + 0.587f * color.g + 0.114f * color.b;
+
+	imageStore(u_Framebuffer, ivec2(pixel), vec4(intensity, intensity, intensity, 1.f)); 
 }

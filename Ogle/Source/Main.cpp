@@ -255,12 +255,13 @@ int main()
 
     Mesh fullscreen_quad(quad_vertices, 8 * 2, quad_indices, 6);
 
+    // Ray Tracing Test
+
     // Todo: I think this should be an immutable storage according to OpenGL
-    Texture2D fb_texture(g_width, g_height, GL_RGBA32F, GL_RGBA, GL_FLOAT);
+    Texture2D raytracing_fb_texture(g_width, g_height, GL_RGBA32F, GL_RGBA, GL_FLOAT);
 
     Shader fullscreen_quad_shader("Source/Shaders/FullscreenQuadShader.vert", "Source/Shaders/FullscreenQuadShader.frag");
 
-    // Ray Tracing Test
     Shader raytracing_shader("Source/Shaders/Raytracing.comp");
 
     glm::mat4 view = glm::translate(glm::mat4(1.f), -g_camera_position);
@@ -290,6 +291,10 @@ int main()
     glClearColor(0.1f, 0.1f, 0.1f, 1.f);
 
     // Image Processing Test
+    Texture2D imageprocessing_fb_texture(g_width, g_height, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, GL_LINEAR, GL_LINEAR);
+
+    Shader blur_shader("Source/Shaders/GaussianBlur.comp");
+
     const char* image_path = "../Resources/container.jpg";
     int image_tex_width, image_tex_height, image_tex_channel_count;
     unsigned char* image_data = stbi_load(image_path, &image_tex_width, &image_tex_height, &image_tex_channel_count, 3);
@@ -341,12 +346,20 @@ int main()
 
         if (g_show_image_test)
         {
-            glClearColor(0.8f, 0.3f, 0.2f, 1.f);
-            glClear(GL_COLOR_BUFFER_BIT);
-
-            Shader blur_shader("Source/Shaders/GaussianBlur.comp");
+            blur_shader.Bind();
 
             image_tex.Bind();
+
+            // Bind level 0 of the framebuffer texture to image binding point 0
+            glBindImageTexture(0, imageprocessing_fb_texture.id, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+
+            // Dispatch the compute shader to generate a frame in the framebuffer image
+            glDispatchCompute(g_width / work_group_size[0], g_height / work_group_size[1], 1);
+            
+            // Unbind image binding point
+            glBindImageTexture(0, 0, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+
+            imageprocessing_fb_texture.Bind();
 
             fullscreen_quad.BindVAO();
             fullscreen_quad_shader.Bind();
@@ -376,7 +389,7 @@ int main()
             raytracing_shader.SetVec3("u_RayDirection11", ray_direction11.x, ray_direction11.y, ray_direction11.z);
 
             // Bind level 0 of the framebuffer texture to image binding point 0
-            glBindImageTexture(0, fb_texture.id, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+            glBindImageTexture(0, raytracing_fb_texture.id, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 
             // Dispatch the compute shader to generate a frame in the framebuffer image
             glDispatchCompute(g_width / work_group_size[0], g_height / work_group_size[1], 1);
@@ -385,7 +398,7 @@ int main()
             glBindImageTexture(0, 0, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 
             glActiveTexture(GL_TEXTURE0);
-            fb_texture.Bind();
+            raytracing_fb_texture.Bind();
 
             fullscreen_quad_shader.Bind();
             fullscreen_quad.BindVAO();
