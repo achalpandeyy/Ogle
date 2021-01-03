@@ -9,7 +9,11 @@ struct Texture2D
 
     ~Texture2D();
 
-    inline void Bind() const { glBindTexture(GL_TEXTURE_2D, id); }
+    inline void Bind(const unsigned int unit = 0) const
+    {
+        glActiveTexture(GL_TEXTURE0 + unit);
+        glBindTexture(GL_TEXTURE_2D, id);
+    }
     inline void Unbind() const { glBindTexture(GL_TEXTURE_2D, 0); }
 
     GLuint id = GLuint(-1);

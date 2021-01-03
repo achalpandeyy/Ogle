@@ -38,6 +38,12 @@ Shader::~Shader()
     glDeleteProgram(id);
 }
 
+void Shader::SetInt(const char* name, const GLint value) const
+{
+    GLint location = glGetUniformLocation(id, name);
+    glUniform1i(location, value);
+}
+
 void Shader::SetMat4(const char* name, const GLfloat* value, GLboolean transpose) const
 {
     GLint location = glGetUniformLocation(id, name);

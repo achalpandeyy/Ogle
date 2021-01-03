@@ -291,7 +291,37 @@ int main()
     glClearColor(0.1f, 0.1f, 0.1f, 1.f);
 
     // Image Processing Test
-    Texture2D imageprocessing_fb_texture(g_width, g_height, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, GL_LINEAR, GL_LINEAR);
+
+    const int blur_kernel_width = 9;
+    const float blur_kernel_sigma = 2.f;
+
+    float* blur_kernel = (float*)malloc(blur_kernel_width * blur_kernel_width * sizeof(float));
+
+    float filter_sum = 0.f;
+    for (int y = -blur_kernel_width / 2; y <= blur_kernel_width / 2; ++y)
+    {
+        for (int x = -blur_kernel_width / 2; x <= blur_kernel_width / 2; ++x)
+        {
+            const float filter_value = expf(-float(x * x + y * y) / (2.f * blur_kernel_sigma * blur_kernel_sigma));
+
+            unsigned int idx = (y + blur_kernel_width/2) * blur_kernel_width + (x + blur_kernel_width/2);
+            blur_kernel[idx] = filter_value;
+
+            filter_sum += filter_value;
+        }
+    }
+
+    float normalization_factor = 1.f / filter_sum;
+    for (int y = -blur_kernel_width / 2; y <= blur_kernel_width / 2; ++y)
+    {
+        for (int x = -blur_kernel_width / 2; x <= blur_kernel_width / 2; ++x)
+        {
+            unsigned int idx = (y + blur_kernel_width / 2) * blur_kernel_width + (x + blur_kernel_width / 2);
+            blur_kernel[idx] *= normalization_factor;
+        }
+    }
+
+    Texture2D blur_kernel_texture(blur_kernel_width, blur_kernel_width, GL_R32F, GL_RED, GL_FLOAT, GL_NEAREST, GL_NEAREST, blur_kernel);
 
     Shader blur_shader("Source/Shaders/GaussianBlur.comp");
 
@@ -306,6 +336,8 @@ int main()
     }
 
     Texture2D image_tex(image_tex_width, image_tex_height, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, GL_LINEAR, GL_LINEAR, image_data);
+
+    Texture2D imageprocessing_fb_texture(image_tex_width, image_tex_height, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, GL_LINEAR, GL_LINEAR);
 
     stbi_image_free(image_data);
 
@@ -348,19 +380,24 @@ int main()
         {
             blur_shader.Bind();
 
+            blur_shader.SetInt("u_ImageSampler", 0);
             image_tex.Bind();
+
+            blur_shader.SetInt("u_FilterSampler", 1);
+            blur_kernel_texture.Bind(1);
 
             // Bind level 0 of the framebuffer texture to image binding point 0
             glBindImageTexture(0, imageprocessing_fb_texture.id, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
             // Dispatch the compute shader to generate a frame in the framebuffer image
-            glDispatchCompute(g_width / work_group_size[0], g_height / work_group_size[1], 1);
+            glDispatchCompute(image_tex_width / work_group_size[0], image_tex_height / work_group_size[1], 1);
             
             // Unbind image binding point
             glBindImageTexture(0, 0, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
             imageprocessing_fb_texture.Bind();
 
+            // Note: This will strech imageprocessing_fb_texture along the x axis and display it
             fullscreen_quad.BindVAO();
             fullscreen_quad_shader.Bind();
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -408,6 +445,7 @@ int main()
         glfwSwapBuffers(window);
     }
 
+    free(blur_kernel);
     glfwTerminate();
 
     return 0;
