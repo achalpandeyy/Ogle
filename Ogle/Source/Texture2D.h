@@ -4,7 +4,7 @@
 
 struct Texture2D
 {
-    Texture2D(unsigned int width, unsigned int height, GLint internal_format, GLenum format, GLenum type,
+    Texture2D(unsigned int width_, unsigned int height_, GLint internal_format, GLenum format, GLenum type,
         GLint min_filter = GL_NEAREST, GLint max_filter = GL_NEAREST, const GLvoid* data = 0);
 
     ~Texture2D();
@@ -17,6 +17,8 @@ struct Texture2D
     inline void Unbind() const { glBindTexture(GL_TEXTURE_2D, 0); }
 
     GLuint id = GLuint(-1);
+    unsigned int width;
+    unsigned int height;
 };
 
 #define TEXTURE_2D_H

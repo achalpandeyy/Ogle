@@ -1,7 +1,7 @@
 #include "Texture2D.h"
 
-Texture2D::Texture2D(unsigned int width, unsigned int height, GLint internal_format, GLenum format, GLenum type,
-    GLint min_filter, GLint max_filter, const GLvoid* data)
+Texture2D::Texture2D(unsigned int width_, unsigned int height_, GLint internal_format, GLenum format, GLenum type,
+    GLint min_filter, GLint max_filter, const GLvoid* data) : width(width_), height(height_)
 {
     glGenTextures(1, &id);
     Bind();
