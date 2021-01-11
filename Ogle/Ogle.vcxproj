@@ -91,6 +91,7 @@
     <ClCompile Include="External\glad\src\glad.c" />
     <ClCompile Include="External\glm\detail\glm.cpp" />
     <ClCompile Include="External\stb_image\stb_image.cpp" />
+    <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Mesh.cpp" />
     <ClCompile Include="Source\Shader.cpp" />
@@ -384,6 +385,7 @@
     <ClInclude Include="External\glm\vec4.hpp" />
     <ClInclude Include="External\glm\vector_relational.hpp" />
     <ClInclude Include="External\stb_image\stb_image.h" />
+    <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Mesh.h" />
     <ClInclude Include="Source\Shader.h" />
     <ClInclude Include="Source\Texture2D.h" />
@@ -528,6 +530,7 @@
     <None Include="External\glm\gtx\wrap.inl" />
     <None Include="Source\Shaders\FullscreenQuadShader.frag" />
     <None Include="Source\Shaders\FullscreenQuadShader.vert" />
+    <None Include="Source\Shaders\GaussianBlur.comp" />
     <None Include="Source\Shaders\Raytracing.comp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -36,6 +36,9 @@
     <ClCompile Include="Source\Texture2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\glad\include\glad\glad.h">
@@ -911,6 +914,9 @@
     <ClInclude Include="Source\Texture2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Application.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="External\glm\detail\func_common.inl">
@@ -1324,5 +1330,6 @@
     <None Include="Source\Shaders\Raytracing.comp" />
     <None Include="Source\Shaders\FullscreenQuadShader.frag" />
     <None Include="Source\Shaders\FullscreenQuadShader.vert" />
+    <None Include="Source\Shaders\GaussianBlur.comp" />
   </ItemGroup>
 </Project>
