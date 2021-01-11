@@ -20,22 +20,16 @@ struct Application
     virtual void Initialize() = 0;
     virtual void Update() = 0;
 
-    virtual void SetApplicationSettings() { settings = ApplicationSettings(); }
-
     virtual ~Application() {}
 
     int Run();
 
 protected:
-    virtual void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
-    virtual void MouseCallback(GLFWwindow* window, double x_pos, double y_pos);
-    virtual void ScrollCallback(GLFWwindow* window, double x_offset, double y_offset);
-    virtual void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-
-    static void GLFWFramebufferSizeCallback(GLFWwindow* window, int width, int height);
-    static void GLFWMouseCallback(GLFWwindow* window, double x_pos, double y_pos);
-    static void GLFWScrollCallback(GLFWwindow* window, double x_offset, double y_offset);
-    static void GLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+    virtual void OnWindowResize(int width, int height) {}
+    virtual void OnKeyPress(int key_code) {}
+    virtual void OnKeyRelease(int key_code) {}
+    virtual void OnMouseMove(double x, double y) {}
+    virtual void OnMouseScroll(double vertical_offset) {}
 
     GLFWwindow* window = nullptr;
     float delta_time = 0.f;
@@ -50,6 +44,16 @@ protected:
 
 private:
     void InitializeBase();
+
+    void GLFWFramebufferSizeCallback(GLFWwindow* window, int width, int height);
+    void GLFWMouseCallback(GLFWwindow* window, double x_pos, double y_pos);
+    void GLFWScrollCallback(GLFWwindow* window, double x_offset, double y_offset);
+    void GLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+    static void GLFWFramebufferSizeCallbackHelper(GLFWwindow* window, int width, int height);
+    static void GLFWMouseCallbackHelper(GLFWwindow* window, double x_pos, double y_pos);
+    static void GLFWScrollCallbackHelper(GLFWwindow* window, double x_offset, double y_offset);
+    static void GLFWKeyCallbackHelper(GLFWwindow* window, int key, int scancode, int action, int mods);
 
     //     // Todo: Connect this ApplicationSettings::enable_debug_callback not the _DEBUG macro
     // #ifdef _DEBUG

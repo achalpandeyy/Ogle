@@ -48,11 +48,11 @@ std::unique_ptr<Mesh> GetFullscreenQuad()
 
 struct RayTracing final : public Application
 {
-    void SetApplicationSettings() override
+    RayTracing()
     {
         settings.width = 1280;
         settings.height = 720;
-        settings.window_title = "Ray Tracing";
+        settings.window_title = "Ray Tracing | Ogle";
         settings.enable_cursor = false;
         settings.enable_debug_callback = true;
     }
@@ -69,30 +69,16 @@ struct RayTracing final : public Application
         glGetProgramiv(raytracing_cs->id, GL_COMPUTE_WORK_GROUP_SIZE, work_group_size.get());
     }
 
-    // Todo: This shouldn't directly interface with glfw code
     void Update() override
     {
-        const float camera_speed = 10.f * delta_time;
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        {
-            g_camera_position += camera_speed * g_camera_front;
-        }
+        float delta_distance_front = camera_speed_front * delta_time;
+        float delta_distance_right = camera_speed_right * delta_time;
 
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        {
-            g_camera_position -= camera_speed * g_camera_front;
-        }
+        g_camera_position += delta_distance_front * g_camera_front;
 
+        // Todo: Make camera_right global (later, a member) as well
         glm::vec3 camera_right = glm::normalize(glm::cross(g_camera_front, g_camera_orientation));
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        {
-            g_camera_position -= camera_speed * camera_right;
-        }
-
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        {
-            g_camera_position += camera_speed * camera_right;
-        }
+        g_camera_position += delta_distance_right * camera_right;
 
         glm::mat4 view = glm::lookAt(g_camera_position, g_camera_position + g_camera_front, g_camera_orientation);
         glm::mat4 proj = glm::perspective(glm::radians(g_camera_fov), (float)settings.width / (float)settings.height, 0.1f, 100.f);
@@ -131,23 +117,39 @@ struct RayTracing final : public Application
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
 
-    // Todo: This shouldn't also directly interface with glfw code
-    void FramebufferSizeCallback(GLFWwindow* window, int width, int height) override
+    void OnKeyPress(int key_code) override
     {
-        glViewport(0, 0, width, height);
+        if (key_code == GLFW_KEY_W)
+            camera_speed_front = 10.f;
+        else if (key_code == GLFW_KEY_S)
+            camera_speed_front = -10.f;
+
+        if (key_code == GLFW_KEY_D)
+            camera_speed_right = 10.f;
+        else if (key_code == GLFW_KEY_A)
+            camera_speed_right = -10.f;
     }
 
-    void MouseCallback(GLFWwindow* window, double x_pos, double y_pos) override
+    void OnKeyRelease(int key_code) override
+    {
+        if (key_code == GLFW_KEY_W || key_code == GLFW_KEY_S)
+            camera_speed_front = 0.f;
+        
+        if (key_code == GLFW_KEY_D || key_code == GLFW_KEY_A)
+            camera_speed_right = 0.f;
+    }
+
+    void OnMouseMove(double x, double y) override
     {
         if (g_first_mouse)
         {
-            g_last_x = x_pos;
-            g_last_y = y_pos;
+            g_last_x = x;
+            g_last_y = y;
             g_first_mouse = false;
         }
 
-        float x_offset = (float)(x_pos - g_last_x);
-        float y_offset = (float)(g_last_y - y_pos);
+        float x_offset = (float)(x- g_last_x);
+        float y_offset = (float)(g_last_y - y);
 
         const float sensitivity = 0.05f;
         x_offset *= sensitivity;
@@ -164,25 +166,14 @@ struct RayTracing final : public Application
 
         g_camera_front = glm::normalize(g_camera_front);
 
-        g_last_x = x_pos;
-        g_last_y = y_pos;
+        g_last_x = x;
+        g_last_y = y;
     }
 
-    void ScrollCallback(GLFWwindow* window, double x_offset, double y_offset) override
+    void OnMouseScroll(double vertical_offset) override
     {
-        g_camera_fov -= (float)y_offset;
+        g_camera_fov -= (float)vertical_offset;
         g_camera_fov = glm::clamp(g_camera_fov, 1.f, 45.f);
-    }
-
-    void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) override
-    {
-        switch (key)
-        {
-            case GLFW_KEY_ESCAPE:
-            {
-                glfwSetWindowShouldClose(window, GLFW_TRUE);
-            } break;
-        }
     }
 
 private:
@@ -191,15 +182,18 @@ private:
     std::unique_ptr<Texture2D> fb_texture = nullptr; // Todo: I think the OpenGL spec wants this to be an immutable storage
     std::unique_ptr<Mesh> fullscreen_quad = nullptr;
     std::unique_ptr<GLint[]> work_group_size = nullptr;
+
+    float camera_speed_front = 0.f;
+    float camera_speed_right = 0.f;
 };
 
 struct ImageProcessing final : public Application
 {
-    void SetApplicationSettings() override
+    ImageProcessing()
     {
         settings.width = 1280;
         settings.height = 720;
-        settings.window_title = "Image Processing";
+        settings.window_title = "Image Processing | Ogle";
         settings.enable_cursor = true;
         settings.enable_debug_callback = true;
     }
@@ -290,17 +284,6 @@ struct ImageProcessing final : public Application
         fullscreen_quad->BindVAO();
         fullscreen_quad_prog->Bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    }
-
-    void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) override
-    {
-        switch (key)
-        {
-        case GLFW_KEY_ESCAPE:
-        {
-            glfwSetWindowShouldClose(window, GLFW_TRUE);
-        } break;
-        }
     }
 
 private:

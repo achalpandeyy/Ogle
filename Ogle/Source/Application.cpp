@@ -25,13 +25,32 @@ int Application::Run()
     return 0;
 }
 
-void Application::FramebufferSizeCallback(GLFWwindow* window, int width, int height) {}
+void Application::GLFWFramebufferSizeCallback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+    OnWindowResize(width, height);
+}
 
-void Application::MouseCallback(GLFWwindow* window, double x_pos, double y_pos) {}
+void Application::GLFWMouseCallback(GLFWwindow* window, double x_pos, double y_pos)
+{
+    OnMouseMove(x_pos, y_pos);
+}
 
-void Application::ScrollCallback(GLFWwindow* window, double x_offset, double y_offset) {}
+void Application::GLFWScrollCallback(GLFWwindow* window, double x_offset, double y_offset)
+{
+    OnMouseScroll(y_offset);
+}
 
-void Application::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {}
+void Application::GLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+
+    if (action == GLFW_PRESS || action == GLFW_REPEAT)
+        OnKeyPress(key);
+    else if (action == GLFW_RELEASE)
+        OnKeyRelease(key);
+}
 
 // // Todo: Connect this ApplicationSettings::enable_debug_callback not the _DEBUG macro
 // #ifdef _DEBUG
@@ -87,8 +106,6 @@ void Application::InitializeBase()
     if (glfwInit() != GLFW_TRUE)
         exit(-1);
 
-    SetApplicationSettings();
-
     if (settings.enable_debug_callback)
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 
@@ -100,10 +117,10 @@ void Application::InitializeBase()
     }
 
     // Callbacks
-    glfwSetFramebufferSizeCallback(window, GLFWFramebufferSizeCallback);
-    glfwSetKeyCallback(window, GLFWKeyCallback);
-    glfwSetCursorPosCallback(window, GLFWMouseCallback);
-    glfwSetScrollCallback(window, GLFWScrollCallback);
+    glfwSetFramebufferSizeCallback(window, GLFWFramebufferSizeCallbackHelper);
+    glfwSetKeyCallback(window, GLFWKeyCallbackHelper);
+    glfwSetCursorPosCallback(window, GLFWMouseCallbackHelper);
+    glfwSetScrollCallback(window, GLFWScrollCallbackHelper);
 
     // Input Modes
     glfwSetInputMode(window, GLFW_CURSOR, settings.enable_cursor ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
@@ -165,26 +182,26 @@ void Application::InitializeBase()
     }
 }
 
-void Application::GLFWFramebufferSizeCallback(GLFWwindow* window, int width, int height)
+void Application::GLFWFramebufferSizeCallbackHelper(GLFWwindow* window, int width, int height)
 {
     Application* app = (Application*)glfwGetWindowUserPointer(window);
-    app->FramebufferSizeCallback(window, width, height);
+    app->GLFWFramebufferSizeCallback(window, width, height);
 }
 
-void Application::GLFWMouseCallback(GLFWwindow* window, double x_pos, double y_pos)
+void Application::GLFWMouseCallbackHelper(GLFWwindow* window, double x_pos, double y_pos)
 {
     Application* app = (Application*)glfwGetWindowUserPointer(window);
-    app->MouseCallback(window, x_pos, y_pos);
+    app->GLFWMouseCallback(window, x_pos, y_pos);
 }
 
-void Application::GLFWScrollCallback(GLFWwindow* window, double x_offset, double y_offset)
+void Application::GLFWScrollCallbackHelper(GLFWwindow* window, double x_offset, double y_offset)
 {
     Application* app = (Application*)glfwGetWindowUserPointer(window);
-    app->ScrollCallback(window, x_offset, y_offset);
+    app->GLFWScrollCallback(window, x_offset, y_offset);
 }
 
-void Application::GLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void Application::GLFWKeyCallbackHelper(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     Application* app = (Application*)glfwGetWindowUserPointer(window);
-    app->KeyCallback(window, key, scancode, action, mods);
+    app->GLFWKeyCallback(window, key, scancode, action, mods);
 }
