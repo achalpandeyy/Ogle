@@ -1,6 +1,7 @@
 #ifndef MESH_H
 
 #include <glad/glad.h>
+#include <cstdint>
 
 namespace Ogle
 {
