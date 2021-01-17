@@ -16,7 +16,7 @@ struct Shader
     void Unbind() const { glUseProgram(0); }
 
     void SetInt(const char* name, const GLint value) const;
-    void SetMat4(const char* name, const GLfloat* value, GLboolean transpose) const;
+    void SetMat4(const char* name, const GLfloat* value, GLboolean transpose = false) const;
     void SetVec3(const char* name, const GLfloat x, const GLfloat y, const GLfloat z) const;
 
     GLuint id;

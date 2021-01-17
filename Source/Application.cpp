@@ -33,9 +33,12 @@ void Application::GLFWFramebufferSizeCallback(GLFWwindow* window, int width, int
     OnWindowResize(width, height);
 }
 
-void Application::GLFWMouseCallback(GLFWwindow* window, double x_pos, double y_pos)
+void Application::GLFWMouseCallback(GLFWwindow* window, double x, double y)
 {
-    OnMouseMove(x_pos, y_pos);
+    // Todo: Here you not only want to call the callback but you need to calculate the offsets first
+    OnMouseMove(float(x - last_x), float(last_y - y));
+    last_x = (float)x;
+    last_y = (float)y;
 }
 
 void Application::GLFWScrollCallback(GLFWwindow* window, double x_offset, double y_offset)
@@ -182,6 +185,10 @@ void Application::InitializeBase()
 
         std::cout << "Max Work Group Invocations: " << max_work_group_invocations << std::endl;
     }
+
+    // Mouse
+    last_x = settings.width / 2.f;
+    last_y = settings.height / 2.f;
 }
 
 void Application::GLFWFramebufferSizeCallbackHelper(GLFWwindow* window, int width, int height)

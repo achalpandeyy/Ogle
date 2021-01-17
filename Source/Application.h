@@ -30,7 +30,7 @@ protected:
     virtual void OnWindowResize(int width, int height) {}
     virtual void OnKeyPress(int key_code) {}
     virtual void OnKeyRelease(int key_code) {}
-    virtual void OnMouseMove(double x, double y) {}
+    virtual void OnMouseMove(float x_offset, float y_offset) {}
     virtual void OnMouseScroll(double vertical_offset) {}
 
     GLFWwindow* window = nullptr;
@@ -62,6 +62,9 @@ private:
     //     void WINAPI GLDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message,
     //         const void* user_param);
     // #endif
+
+    float last_x = 0.f;
+    float last_y = 0.f;
 };
 }   // namespace Ogle
 
