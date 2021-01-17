@@ -7,7 +7,7 @@ namespace Ogle
 {
 struct Camera
 {
-    Camera(const glm::vec3& position_);
+    Camera(const glm::vec3& position_, float movement_speed_ = 10000.f, float mouse_sensitivity_ = 0.1f);
 
     inline glm::mat4 GetProjViewMatrix(float aspect_ratio) const
     {
@@ -27,7 +27,8 @@ private:
     glm::vec3 up;           // Y
 
     const glm::vec3 world_up = glm::vec3(0.f, 1.f, 0.f);
-    const float sensitivity = 0.1f;
+    float movement_speed;
+    float mouse_sensitivity;
 
     float pitch = 0.f;      // X
     float yaw = -90.f;      // Y
