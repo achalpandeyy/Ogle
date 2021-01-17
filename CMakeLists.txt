@@ -14,6 +14,7 @@ set(OGLE_SOURCE
 	"${CMAKE_CURRENT_SOURCE_DIR}/Source/Mesh.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Source/Shader.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Source/Texture2D.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/Source/Camera.cpp"
 	
 	"${CMAKE_CURRENT_SOURCE_DIR}/External/glad/src/glad.c")
 

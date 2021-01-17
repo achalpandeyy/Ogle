@@ -31,7 +31,7 @@ protected:
     virtual void OnKeyPress(int key_code) {}
     virtual void OnKeyRelease(int key_code) {}
     virtual void OnMouseMove(float x_offset, float y_offset) {}
-    virtual void OnMouseScroll(double vertical_offset) {}
+    virtual void OnMouseScroll(float vertical_offset) {}
 
     GLFWwindow* window = nullptr;
     float delta_time = 0.f;

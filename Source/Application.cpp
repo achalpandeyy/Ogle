@@ -43,7 +43,7 @@ void Application::GLFWMouseCallback(GLFWwindow* window, double x, double y)
 
 void Application::GLFWScrollCallback(GLFWwindow* window, double x_offset, double y_offset)
 {
-    OnMouseScroll(y_offset);
+    OnMouseScroll((float)y_offset);
 }
 
 void Application::GLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
