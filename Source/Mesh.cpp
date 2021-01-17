@@ -34,7 +34,7 @@ VertexArray::VertexArray(VertexBuffer* vbo, IndexBuffer* ibo, VertexAttribs* att
 
     Bind();
     vbo->Bind();
-    ibo->Bind();
+    if (ibo) ibo->Bind();
 
     for (GLuint i = 0; i < attrib_count; ++i)
     {
@@ -43,7 +43,7 @@ VertexArray::VertexArray(VertexBuffer* vbo, IndexBuffer* ibo, VertexAttribs* att
     }
 
     vbo->Unbind();
-    ibo->Unbind();
+    if (ibo) ibo->Unbind();
     Unbind();
 }
 
