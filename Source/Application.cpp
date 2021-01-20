@@ -35,7 +35,6 @@ void Application::GLFWFramebufferSizeCallback(GLFWwindow* window, int width, int
 
 void Application::GLFWMouseCallback(GLFWwindow* window, double x, double y)
 {
-    // Todo: Here you not only want to call the callback but you need to calculate the offsets first
     OnMouseMove(float(x - last_x), float(last_y - y));
     last_x = (float)x;
     last_y = (float)y;

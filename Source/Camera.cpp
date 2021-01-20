@@ -10,7 +10,6 @@ Camera::Camera(const glm::vec3& position_, float movement_speed_, float mouse_se
     UpdateCameraVectors();
 }
 
-// Todo: Don't use GLFW things here
 void Camera::ProcessKeyboard(int key_code, float delta_time)
 {
     float delta_distance = movement_speed * delta_time;

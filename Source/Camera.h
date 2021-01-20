@@ -14,6 +14,7 @@ struct Camera
         return glm::perspective(glm::radians(fov_y), aspect_ratio, 0.1f, 1000.f) * glm::lookAt(position, position + front, up);
     }
 
+    // Todo: This keyboard movement is kind of choppy fix it ffs
     void ProcessKeyboard(int key_code, float delta_time);
     void ProcessMouseMove(float x_offset, float y_offset);
     void ProcessMouseScroll(float vertical_offset);
