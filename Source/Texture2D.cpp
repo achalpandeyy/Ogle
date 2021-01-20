@@ -37,6 +37,12 @@ Texture2D* Texture2D::CreateFromFile(const char* path, bool flip_vertically)
 
         switch (channel_count)
         {
+            case 1:
+            {
+                internal_format = GL_R8;
+                format = GL_RED;
+            } break;
+
             case 3:
             {
                 internal_format = GL_RGB8;
@@ -65,6 +71,12 @@ Texture2D* Texture2D::CreateFromFile(const char* path, bool flip_vertically)
     stbi_image_free(data);
 
     return result;
+}
+
+void Texture2D::BindImage(GLuint unit, GLenum access, GLenum format) const
+{
+    Bind();
+    glBindImageTexture(unit, id, 0, GL_FALSE, 0, access, format);
 }
 
 Texture2D::~Texture2D()
