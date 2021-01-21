@@ -40,21 +40,27 @@ Shader::~Shader()
     glDeleteProgram(id);
 }
 
-void Shader::SetInt(const char* name, const GLint value) const
+void Shader::SetInt(const char* name, const GLint value)
 {
-    GLint location = glGetUniformLocation(id, name);
+    GLint location = GetUniformLocation(name);
     glUniform1i(location, value);
 }
 
-void Shader::SetMat4(const char* name, const GLfloat* value, GLboolean transpose) const
+void Shader::SetFloat(const char* name, const GLfloat value)
 {
-    GLint location = glGetUniformLocation(id, name);
+    GLint location = GetUniformLocation(name);
+    glUniform1f(location, value);
+}
+
+void Shader::SetMat4(const char* name, const GLfloat* value, GLboolean transpose)
+{
+    GLint location = GetUniformLocation(name);
     glUniformMatrix4fv(location, 1, transpose, value);
 }
 
-void Shader::SetVec3(const char* name, const GLfloat x, const GLfloat y, const GLfloat z) const
+void Shader::SetVec3(const char* name, const GLfloat x, const GLfloat y, const GLfloat z)
 {
-    GLint location = glGetUniformLocation(id, name);
+    GLint location = GetUniformLocation(name);
     glUniform3f(location, x, y, z);
 }
 
@@ -135,5 +141,18 @@ bool Shader::CheckShaderErrors(GLuint shader, ShaderType type) const
     }
 
     return false;
+}
+
+GLint Shader::GetUniformLocation(const char* name)
+{
+    if (uniform_location_cache.find(name) != uniform_location_cache.end())
+        return uniform_location_cache[name];
+
+    GLint location = glGetUniformLocation(id, name);
+    if (location == -1)
+        std::cout << "Warning: " << name << " uniform doesn't exist!" << std::endl;
+
+    uniform_location_cache[name] = location;
+    return location;
 }
 }   // namespace Ogle
