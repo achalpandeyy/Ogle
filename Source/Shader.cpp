@@ -6,6 +6,15 @@
 
 namespace Ogle
 {
+ShaderStorageBuffer::ShaderStorageBuffer(const GLvoid* data, GLsizeiptr size)
+{
+    glGenBuffers(1, &id);
+
+    Bind();
+    glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, GL_STATIC_DRAW);
+    Unbind();
+}
+
 Shader::Shader(const char* vertex_path, const char* fragment_path)
 {
     GLuint vertex_shader = CreateShader(vertex_path, ShaderType::Vertex);

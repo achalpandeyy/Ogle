@@ -5,6 +5,18 @@
 
 namespace Ogle
 {
+struct ShaderStorageBuffer
+{
+    ShaderStorageBuffer(const GLvoid* data, GLsizeiptr size);
+
+    inline void Bind() const { glBindBuffer(GL_SHADER_STORAGE_BUFFER, id); }
+    inline void Unbind() const { glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0); }
+    inline void BindBase(GLuint binding_index) const { glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding_index, id); }
+
+private:
+    GLuint id;
+};
+
 struct Shader
 {
     Shader(const char* vertex_path, const char* fragment_path);
