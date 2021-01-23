@@ -6,7 +6,7 @@ namespace Ogle
 {
 struct Texture2D
 {
-    Texture2D(unsigned int width_, unsigned int height_, GLint internal_format, GLenum format, GLenum type,
+    Texture2D(unsigned int width_, unsigned int height_, GLint internal_format_, GLenum format, GLenum type,
         GLint min_filter = GL_NEAREST, GLint max_filter = GL_NEAREST, const GLvoid* data = 0);
 
     static Texture2D* CreateFromFile(const char* path, bool flip_vertically = false);
@@ -25,6 +25,7 @@ struct Texture2D
     GLuint id = GLuint(-1);
     unsigned int width;
     unsigned int height;
+    GLint internal_format;
 };
 }   // namespace Ogle
 

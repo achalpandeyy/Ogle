@@ -5,10 +5,11 @@
 
 namespace Ogle
 {
-Texture2D::Texture2D(unsigned int width_, unsigned int height_, GLint internal_format, GLenum format, GLenum type,
-    GLint min_filter, GLint max_filter, const GLvoid* data) : width(width_), height(height_)
+Texture2D::Texture2D(unsigned int width_, unsigned int height_, GLint internal_format_, GLenum format, GLenum type,
+    GLint min_filter, GLint max_filter, const GLvoid* data) : width(width_), height(height_), internal_format(internal_format)
 {
     glGenTextures(1, &id);
+
     Bind();
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
