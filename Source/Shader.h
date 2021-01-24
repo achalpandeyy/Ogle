@@ -21,6 +21,7 @@ struct Shader
 {
     Shader(const char* vertex_path, const char* fragment_path);
     Shader(const char* compute_path);
+    Shader(const char* vs_path, const char* tesc_path, const char* tese_path, const char* fs_path);
 
     ~Shader();
 
@@ -28,6 +29,7 @@ struct Shader
     void Unbind() const { glUseProgram(0); }
 
     void SetInt(const char* name, const GLint value);
+    void SetUnsignedInt(const char* name, const GLuint value);
     void SetFloat(const char* name, const GLfloat value);
     void SetMat4(const char* name, const GLfloat* value, GLboolean transpose = false);
     void SetVec3(const char* name, const GLfloat x, const GLfloat y, const GLfloat z);
@@ -40,6 +42,8 @@ private:
         Vertex,
         Fragment,
         Compute,
+        TessellationControl,
+        TessellationEvaluation,
         Program
     };
 

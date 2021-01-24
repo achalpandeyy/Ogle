@@ -44,6 +44,28 @@ Shader::Shader(const char* compute_path)
     glDeleteShader(compute_shader);
 }
 
+Shader::Shader(const char* vs_path, const char* tesc_path, const char* tese_path, const char* fs_path)
+{
+    GLuint vs = CreateShader(vs_path, ShaderType::Vertex);
+    GLuint tcs = CreateShader(tesc_path, ShaderType::TessellationControl);
+    GLuint tes = CreateShader(tese_path, ShaderType::TessellationEvaluation);
+    GLuint fs = CreateShader(fs_path, ShaderType::Fragment);
+
+    id = glCreateProgram();
+    glAttachShader(id, vs);
+    glAttachShader(id, tcs);
+    glAttachShader(id, tes);
+    glAttachShader(id, fs);
+    glLinkProgram(id);
+
+    if (CheckShaderErrors(id, ShaderType::Program)) exit(1);
+
+    glDeleteShader(vs);
+    glDeleteShader(tcs);
+    glDeleteShader(tes);
+    glDeleteShader(fs);
+}
+
 Shader::~Shader()
 {
     glDeleteProgram(id);
@@ -53,6 +75,12 @@ void Shader::SetInt(const char* name, const GLint value)
 {
     GLint location = GetUniformLocation(name);
     glUniform1i(location, value);
+}
+
+void Shader::SetUnsignedInt(const char* name, const GLuint value)
+{
+    GLint location = GetUniformLocation(name);
+    glUniform1ui(location, value);
 }
 
 void Shader::SetFloat(const char* name, const GLfloat value)
@@ -88,12 +116,18 @@ GLuint Shader::CreateShader(const char* path, ShaderType type) const
         GLenum shader_type = GL_VERTEX_SHADER;
         switch (type)
         {
-        case ShaderType::Fragment:
-            shader_type = GL_FRAGMENT_SHADER;
-            break;
-        case ShaderType::Compute:
-            shader_type = GL_COMPUTE_SHADER;
-            break;
+            case ShaderType::Fragment:
+                shader_type = GL_FRAGMENT_SHADER;
+                break;
+            case ShaderType::Compute:
+                shader_type = GL_COMPUTE_SHADER;
+                break;
+            case ShaderType::TessellationControl:
+                shader_type = GL_TESS_CONTROL_SHADER;
+                break;
+            case ShaderType::TessellationEvaluation:
+                shader_type = GL_TESS_EVALUATION_SHADER;
+                break;
         }
 
         GLuint shader = glCreateShader(shader_type);

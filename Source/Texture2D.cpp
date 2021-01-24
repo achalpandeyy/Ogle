@@ -76,7 +76,6 @@ Texture2D* Texture2D::CreateFromFile(const char* path, bool flip_vertically)
 
 void Texture2D::BindImage(GLuint unit, GLenum access, GLenum format) const
 {
-    Bind();
     glBindImageTexture(unit, id, 0, GL_FALSE, 0, access, format);
 }
 
