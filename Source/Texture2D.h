@@ -16,7 +16,10 @@ struct Texture2D
         glActiveTexture(GL_TEXTURE0 + unit);
         glBindTexture(GL_TEXTURE_2D, id);
     }
+
     inline void Unbind() const { glBindTexture(GL_TEXTURE_2D, 0); }
+
+    void SetWrappingParams(GLint wrap_r, GLint wrap_s);
 
     void BindImage(GLuint unit, GLenum access, GLenum format) const;
 

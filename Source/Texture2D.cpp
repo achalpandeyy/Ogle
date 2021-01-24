@@ -74,6 +74,12 @@ Texture2D* Texture2D::CreateFromFile(const char* path, bool flip_vertically)
     return result;
 }
 
+void Texture2D::SetWrappingParams(GLint wrap_r, GLint wrap_s)
+{
+    glTextureParameteri(id, GL_TEXTURE_WRAP_R, wrap_r);
+    glTextureParameteri(id, GL_TEXTURE_WRAP_S, wrap_s);
+}
+
 void Texture2D::BindImage(GLuint unit, GLenum access, GLenum format) const
 {
     glBindImageTexture(unit, id, 0, GL_FALSE, 0, access, format);

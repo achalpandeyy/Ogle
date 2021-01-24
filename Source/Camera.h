@@ -19,10 +19,11 @@ struct Camera
     void ProcessMouseMove(float x_offset, float y_offset);
     void ProcessMouseScroll(float vertical_offset);
 
+    glm::vec3 position;
+
 private:
     void UpdateCameraVectors();
 
-    glm::vec3 position;
     glm::vec3 front;        // Z
     glm::vec3 right;        // X
     glm::vec3 up;           // Y
