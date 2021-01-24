@@ -165,19 +165,7 @@ bool Shader::CheckShaderErrors(GLuint shader, ShaderType type) const
             GLchar info_log[512];
             glGetShaderInfoLog(shader, 512, nullptr, info_log);
 
-            std::string shader_type = "vertex";
-            switch (type)
-            {
-            case ShaderType::Fragment:
-                shader_type = "fragment";
-                break;
-            case ShaderType::Compute:
-                shader_type = "compute";
-                break;
-            }
-
-            std::cout << "Failed to compile " << shader_type << " shader.\n"
-                << info_log << std::endl;
+            std::cout << info_log << std::endl;
 
             return true;
         }
