@@ -2,6 +2,9 @@
 
 #include <iostream>
 #include <glm/glm.hpp>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 namespace Ogle
 {
@@ -15,11 +18,18 @@ int Application::Run()
     {
         glfwPollEvents();
 
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
         float start_time = (float)glfwGetTime();
 
         Update();
 
         delta_time = (float)glfwGetTime() - start_time;
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
     }
@@ -138,6 +148,14 @@ void Application::InitializeBase()
         std::cout << "Failed to initialize GLAD" << std::endl;
         exit(-1);
     }
+
+    // Initialize ImGui
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui::StyleColorsDark();
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init();
 
     // if (settings.enable_debug_callback)
     // {
