@@ -32,6 +32,7 @@ struct Shader
     void SetUnsignedInt(const char* name, const GLuint value);
     void SetFloat(const char* name, const GLfloat value);
     void SetMat4(const char* name, const GLfloat* value, GLboolean transpose = false);
+    void SetVec2(const char* name, const GLfloat x, const GLfloat y);
     void SetVec3(const char* name, const GLfloat x, const GLfloat y, const GLfloat z);
 
     GLuint id;

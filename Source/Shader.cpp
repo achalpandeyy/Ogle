@@ -95,6 +95,12 @@ void Shader::SetMat4(const char* name, const GLfloat* value, GLboolean transpose
     glUniformMatrix4fv(location, 1, transpose, value);
 }
 
+void Shader::SetVec2(const char* name, const GLfloat x, const GLfloat y)
+{
+    GLint location = GetUniformLocation(name);
+    glUniform2f(location, x, y);
+}
+
 void Shader::SetVec3(const char* name, const GLfloat x, const GLfloat y, const GLfloat z)
 {
     GLint location = GetUniformLocation(name);
