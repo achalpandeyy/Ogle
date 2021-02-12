@@ -20,6 +20,7 @@ set(OGLE_SOURCE
 	
 	"${CMAKE_CURRENT_SOURCE_DIR}/External/glad/src/glad.c"
 	"${CMAKE_CURRENT_SOURCE_DIR}/External/stb_image/stb_image.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/External/stb_image/stb_image_write.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/External/imgui/imgui.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/External/imgui/imgui_demo.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/External/imgui/imgui_draw.cpp"
