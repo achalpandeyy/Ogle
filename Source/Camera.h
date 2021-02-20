@@ -12,7 +12,7 @@ struct Camera
 
     inline glm::mat4 GetProjViewMatrix(float aspect_ratio) const
     {
-        return glm::perspective(glm::radians(fov_y), aspect_ratio, near, far) * glm::lookAt(position, position + front, up);
+        return glm::perspective(glm::radians(fov_y), aspect_ratio, z_near, z_far) * glm::lookAt(position, position + front, up);
     }
 
     // Todo: This keyboard movement is kind of choppy fix it ffs
@@ -37,8 +37,8 @@ private:
     float yaw = -90.f;      // Y
     float fov_y = 60.f;
 
-    float near;
-    float far;
+    float z_near;
+    float z_far;
 };
 }   // namespace Ogle
 
