@@ -4,8 +4,8 @@
 
 namespace Ogle
 {
-Camera::Camera(const glm::vec3& position_, float movement_speed_, float mouse_sensitivity_)
-    : position(position_), movement_speed(movement_speed_), mouse_sensitivity(mouse_sensitivity_)
+Camera::Camera(const glm::vec3& position_, float near_, float far_, float movement_speed_, float mouse_sensitivity_)
+    : position(position_), movement_speed(movement_speed_), mouse_sensitivity(mouse_sensitivity_), near(near_), far(far_)
 {
     UpdateCameraVectors();
 }

@@ -7,11 +7,12 @@ namespace Ogle
 {
 struct Camera
 {
-    Camera(const glm::vec3& position_, float movement_speed_ = 10000.f, float mouse_sensitivity_ = 0.1f);
+    Camera(const glm::vec3& position_, float near_ = 0.1f, float far_ = 1000.f, float movement_speed_ = 10000.f,
+        float mouse_sensitivity_ = 0.1f);
 
     inline glm::mat4 GetProjViewMatrix(float aspect_ratio) const
     {
-        return glm::perspective(glm::radians(fov_y), aspect_ratio, 0.1f, 1000.f) * glm::lookAt(position, position + front, up);
+        return glm::perspective(glm::radians(fov_y), aspect_ratio, near, far) * glm::lookAt(position, position + front, up);
     }
 
     // Todo: This keyboard movement is kind of choppy fix it ffs
@@ -35,6 +36,9 @@ private:
     float pitch = 0.f;      // X
     float yaw = -90.f;      // Y
     float fov_y = 60.f;
+
+    float near;
+    float far;
 };
 }   // namespace Ogle
 
