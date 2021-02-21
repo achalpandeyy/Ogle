@@ -13,10 +13,10 @@ Texture2D::Texture2D(unsigned int width_, unsigned int height_, GLint internal_f
 
     Bind();
 
-    glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
-    glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, max_filter);
-    glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, wrap_r);
-    glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_s);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, max_filter);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, wrap_r);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_s);
 
     glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, type, data);
 
