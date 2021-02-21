@@ -6,23 +6,6 @@
 namespace Ogle
 {
 Texture2D::Texture2D(unsigned int width_, unsigned int height_, GLint internal_format_, GLenum format, GLenum type,
-    GLint min_filter, GLint max_filter, const GLvoid* data)
-{
-    glGenTextures(1, &id);
-
-    Bind();
-
-    glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
-    glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, max_filter);
-    glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
-    glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, type, data);
-
-    Unbind();
-}
-
-Texture2D::Texture2D(unsigned int width_, unsigned int height_, GLint internal_format_, GLenum format, GLenum type,
     GLint min_filter, GLint max_filter, GLint wrap_r, GLint wrap_s, const GLvoid* data) : width(width_), height(height_),
     internal_format(internal_format_)
 {
@@ -80,7 +63,8 @@ Texture2D* Texture2D::CreateFromFile(const char* path, bool flip_vertically)
             } break;
         }
 
-        result = new Texture2D(width, height, internal_format, format, GL_UNSIGNED_BYTE, GL_NEAREST, GL_NEAREST, data);
+        result = new Texture2D(width, height, internal_format, format, GL_UNSIGNED_BYTE, GL_NEAREST, GL_NEAREST,
+            GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER, data);
     }
     else
     {
