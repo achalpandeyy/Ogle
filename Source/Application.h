@@ -38,12 +38,6 @@ protected:
 
     ApplicationSettings settings;
 
-    //     // Todo: Connect this ApplicationSettings::enable_debug_callback not the _DEBUG macro
-    // #ifdef _DEBUG
-    //     void WINAPI GLDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message,
-    //         const void* user_param);
-    // #endif
-
 private:
     void InitializeBase();
 
@@ -56,12 +50,6 @@ private:
     static void GLFWMouseCallbackHelper(GLFWwindow* window, double x_pos, double y_pos);
     static void GLFWScrollCallbackHelper(GLFWwindow* window, double x_offset, double y_offset);
     static void GLFWKeyCallbackHelper(GLFWwindow* window, int key, int scancode, int action, int mods);
-
-    //     // Todo: Connect this ApplicationSettings::enable_debug_callback not the _DEBUG macro
-    // #ifdef _DEBUG
-    //     void WINAPI GLDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message,
-    //         const void* user_param);
-    // #endif
 
     float last_x = 0.f;
     float last_y = 0.f;
